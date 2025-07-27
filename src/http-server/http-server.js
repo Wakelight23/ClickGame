@@ -5,6 +5,7 @@ import { verifyToken } from './auth-controller.js';
 import { config } from '../common/config.js';
 import { handleHttpError } from '../utils/error-handler.js';
 import { handleSignIn } from './user-controller.js';
+import { startEvent, endEvent, getLeaderboard, getWinners } from './event-controller.js';
 
 const defaultHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -57,6 +58,30 @@ function createHttpServer() {
       return handleHttpError(res, err);
     }
   });
+}
+
+// 이벤트 시작
+if (method === 'POST' && url === '/event/start') {
+  const result = await startEvent(gameState);
+  return sendJson(res, 200, result, defaultHeaders);
+}
+
+// 이벤트 종료
+if (method === 'POST' && url === '/event/end') {
+  const result = await endEvent(gameState);
+  return sendJson(res, 200, result, defaultHeaders);
+}
+
+// 리더보드 조회
+if (method === 'GET' && url === '/event/leaderboard') {
+  const result = await getLeaderboard(gameState);
+  return sendJson(res, 200, result, defaultHeaders);
+}
+
+// 우승자 목록 조회
+if (method === 'GET' && url === '/winners') {
+  const result = await getWinners();
+  return sendJson(res, 200, result, defaultHeaders);
 }
 
 export function startHttpServer() {

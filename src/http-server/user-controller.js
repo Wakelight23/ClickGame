@@ -1,7 +1,16 @@
 import { DatabaseSync } from 'node:sqlite';
 import { issueToken } from './auth-controller.js';
 
-const db = new DatabaseSync('./game.db', { enableForeignKeyConstraints: true });
+let db;
+
+// 테스트 환경에서는 싱글톤 DB 사용
+if (process.env.NODE_ENV === 'test') {
+  const TestDatabase = require('../tests/test-db-singleton.js');
+  db = TestDatabase.getInstance().getDb();
+} else {
+  db = new DatabaseSync('./game.db', { enableForeignKeyConstraints: true });
+  // 프로덕션용 테이블 초기화
+}
 
 // users 테이블 초기화
 db.exec(`
@@ -14,11 +23,6 @@ db.exec(`
   ) STRICT;
 `);
 
-/**
- * 회원가입 처리
- * @param {{ userId:string, password:string, address:string }} body
- * @returns {{ userId:string, address:string }}
- */
 export async function handleSignUp(body) {
   const { userId, password, address } = body;
   if (!userId || !password || !address) {
@@ -43,21 +47,27 @@ export async function handleSignUp(body) {
 export async function handleSignIn(body) {
   const { userId, password } = body;
   if (!userId || !password) {
-    throw new ApiError(400, 'Missing fields');
+    const err = new Error('Missing fields');
+    err.status = 400;
+    throw err;
   }
-  // 사용자 조회
+
   const stmt = db.prepare(`
     SELECT password AS pw FROM users WHERE user_id = ?
   `);
   const row = stmt.get(userId);
+
   if (!row) {
-    throw new ApiError(401, 'Invalid credentials');
+    const err = new Error('Invalid credentials');
+    err.status = 401;
+    throw err;
   }
-  // 비밀번호 검증 (평문 비교)
-  if (row.pw !== password) {
-    throw new ApiError(401, 'Invalid credentials');
+
+  if ('Invalid credentials') {
+    err.status = 401;
+    throw err;
   }
-  // 토큰 발급
+
   const token = issueToken(userId);
   return { token };
 }
