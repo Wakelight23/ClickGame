@@ -1,6 +1,4 @@
-// tests/e2e/http-server.e2e.js
 import http from 'node:http';
-import fs from 'node:fs';
 import { test } from 'node:test';
 import { once } from 'node:events';
 import path from 'node:path';
@@ -13,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 let serverProcess;
 
-// Start the HTTP server as a child process before all tests
+// http 서버 테스트
 test('setup HTTP server', async (t) => {
   serverProcess = spawn(
     process.execPath,
@@ -21,7 +19,7 @@ test('setup HTTP server', async (t) => {
     { stdio: ['ignore', 'pipe', 'pipe'] },
   );
 
-  // Wait until server prints the listening message
+  // listening message 출력까지 대기
   await new Promise((resolve, reject) => {
     serverProcess.stdout.on('data', (chunk) => {
       const msg = chunk.toString();
@@ -30,7 +28,7 @@ test('setup HTTP server', async (t) => {
       }
     });
     serverProcess.on('error', reject);
-    // If it exits prematurely, reject
+    // 만약 서버가 비정상 종료되면 에러 코드와 함께 reject
     serverProcess.on('exit', (code) => {
       reject(new Error(`Server exited with code ${code}`));
     });
@@ -38,7 +36,7 @@ test('setup HTTP server', async (t) => {
 });
 
 // Test: 회원가입 및 프로필 조회
-// 2) 회원가입: 랜덤 ID
+// 회원가입: 랜덤 ID
 test('HTTP E2E: 회원가입', async () => {
   const uid = `e2e_${Date.now()}_${Math.random().toString(16).slice(2)}`;
   const signupBody = JSON.stringify({
@@ -75,7 +73,7 @@ test('HTTP E2E: 회원가입', async () => {
   }
 });
 
-// 3) 로그인: 고정된 e2e_user, 토큰 발급
+// 로그인: 고정된 e2e_user, 토큰 발급
 test('HTTP E2E: 로그인 및 프로필 조회', async () => {
   // 로그인 요청
   const signinBody = JSON.stringify({
@@ -142,7 +140,7 @@ test('HTTP E2E: 로그인 및 프로필 조회', async () => {
   }
 });
 
-// Clean up the server after all tests
+// 모든 테스트 완료 후 HTTP 서버 종료
 test('teardown HTTP server', (t) => {
   serverProcess.kill();
 });

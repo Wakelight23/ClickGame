@@ -1,4 +1,3 @@
-// tcp-server/tcp-server.js
 import net from 'node:net';
 import { handleClick } from '../../tcp-server/click-handler.js';
 import { GameState } from '../../tcp-server/game-state.js';
@@ -8,10 +7,7 @@ const gameState = new GameState();
 
 let server;
 
-/**
- * TCP 서버를 생성하고 포트를 바인딩해서 반환
- * @returns {net.Server}
- */
+// TCP 서버를 생성하고 포트를 바인딩해서 반환
 export function startTcpServer() {
   server = net.createServer((socket) => {
     socket.setNoDelay(true);
@@ -30,7 +26,7 @@ export function startTcpServer() {
     socket.on('timeout', () => socket.end());
     socket.on('error', () => socket.destroy());
     socket.on('close', () => {
-      /* 추가 처리 */
+      // 연결 종료 시 게임 상태 정리 및 로그 출력
     });
   });
 

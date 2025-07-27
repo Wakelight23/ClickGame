@@ -1,4 +1,6 @@
-class TestDatabase {
+import { DatabaseSync } from 'node:sqlite';
+
+export class TestDatabase {
   constructor() {
     if (TestDatabase.instance) {
       return TestDatabase.instance;

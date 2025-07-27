@@ -3,26 +3,27 @@ import { issueToken } from './auth-controller.js';
 
 let db;
 
-// 테스트 환경에서는 싱글톤 DB 사용
+// 테스트 환경 감지
+// CLI에 'set NODE_ENV=test' 입력하여 테스트 환경 설정
 if (process.env.NODE_ENV === 'test') {
-  const TestDatabase = require('../tests/test-db-singleton.js');
+  // 동적 import를 사용하여 TestDatabase 가져오기
+  const { TestDatabase } = await import('../tests/utils/test-database.js');
   db = TestDatabase.getInstance().getDb();
 } else {
   db = new DatabaseSync('./game.db', { enableForeignKeyConstraints: true });
-  // 프로덕션용 테이블 초기화
+  // 프로덕션 테이블 초기화
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id       INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id  TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      address  TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    ) STRICT;
+  `);
 }
 
-// users 테이블 초기화
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id       INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id  TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    address  TEXT NOT NULL,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-  ) STRICT;
-`);
-
+// 회원가입 처리 함수
 export async function handleSignUp(body) {
   const { userId, password, address } = body;
   if (!userId || !password || !address) {
@@ -44,6 +45,7 @@ export async function handleSignUp(body) {
   return { userId, address };
 }
 
+// 로그인 처리 함수
 export async function handleSignIn(body) {
   const { userId, password } = body;
   if (!userId || !password) {
@@ -63,7 +65,9 @@ export async function handleSignIn(body) {
     throw err;
   }
 
-  if ('Invalid credentials') {
+  // 비밀번호 검증
+  if (row.pw !== password) {
+    const err = new Error('Invalid credentials');
     err.status = 401;
     throw err;
   }

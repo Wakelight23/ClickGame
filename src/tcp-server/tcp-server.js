@@ -22,9 +22,7 @@ export const server = net.createServer((socket) => {
 
   socket.on('timeout', () => socket.end());
   socket.on('error', () => socket.destroy());
-  socket.on('close', () => {
-    /* 추가 처리 */
-  });
+  socket.on('close', () => {});
 });
 
 // 리스닝 시작 함수 (테스트용)

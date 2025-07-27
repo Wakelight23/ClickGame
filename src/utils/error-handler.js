@@ -1,6 +1,4 @@
-/**
- * API 에러용 커스텀 클래스
- */
+// API 에러용 커스텀
 export class ApiError extends Error {
   /**
    * @param {number} statusCode - HTTP 상태 코드
@@ -12,11 +10,7 @@ export class ApiError extends Error {
   }
 }
 
-/**
- * Express 없이 HTTP 서버에서 에러를 일괄 처리하고 응답을 보내는 헬퍼
- * @param {http.ServerResponse} res
- * @param {Error} err
- */
+// Express 없이 HTTP 서버에서 에러를 일괄 처리하고 응답을 보내는 헬퍼
 export function handleHttpError(res, err) {
   const status = err instanceof ApiError ? err.statusCode : 500;
   const message = err.message || 'Internal Server Error';

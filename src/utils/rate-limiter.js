@@ -21,7 +21,7 @@ export class RateLimiter {
     const timestamps = this.records.get(key) || [];
 
     // 윈도우 외 타임스탬프 제거
-    const recent = timestamps.filter(ts => ts > windowStart);
+    const recent = timestamps.filter((ts) => ts > windowStart);
     recent.push(now);
     this.records.set(key, recent);
 

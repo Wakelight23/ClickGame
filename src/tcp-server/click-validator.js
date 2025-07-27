@@ -6,22 +6,22 @@ export class ClickValidator {
   }
 
   validateClick(userId, timestamp) {
-    // 1. 실격된 사용자 체크
+    // 실격된 사용자 체크
     if (this.disqualifiedUsers.has(userId)) {
       return { valid: false, reason: 'DISQUALIFIED' };
     }
 
-    // 2. 10초간 비활성화 체크
+    // 10초간 비활성화 체크
     const lastClickTime = this.userLastClickTime.get(userId);
     if (lastClickTime && timestamp - lastClickTime > 10000) {
       this.disqualifiedUsers.add(userId);
       return { valid: false, reason: 'INACTIVE_TIMEOUT' };
     }
 
-    // 3. 클릭 히스토리 가져오기
+    // 클릭 히스토리 가져오기
     let clickHistory = this.userClickHistory.get(userId) || [];
 
-    // 4. 슬라이딩 윈도우 검증 (1초 구간 내 4회 초과 체크)
+    // 슬라이딩 윈도우 검증 (1초 구간 내 4회 초과 체크)
     const oneSecondAgo = timestamp - 1000;
     const recentClicks = clickHistory.filter((t) => t > oneSecondAgo);
 
@@ -30,10 +30,10 @@ export class ClickValidator {
       return { valid: false, reason: 'RATE_EXCEEDED' };
     }
 
-    // 5. 클릭 기록 추가
+    // 클릭 기록 추가
     clickHistory.push(timestamp);
 
-    // 6. 오래된 클릭 기록 정리 (5초 이전 기록 삭제)
+    // 오래된 클릭 기록 정리 (5초 이전 기록 삭제)
     clickHistory = clickHistory.filter((t) => t > timestamp - 5000);
     this.userClickHistory.set(userId, clickHistory);
     this.userLastClickTime.set(userId, timestamp);

@@ -92,11 +92,6 @@ export function startHttpServer() {
   return server;
 }
 
-// 직접 실행 시 자동 기동
-// if (import.meta.url === `file://${process.argv[1]}`) {
-//   startHttpServer();
-// }
-
 if (
   process.argv[1].endsWith('/http-server/http-server.js') ||
   process.argv[1].endsWith('\\http-server\\http-server.js')
