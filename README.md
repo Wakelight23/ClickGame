@@ -1,6 +1,13 @@
 # ClickGame
 
-## Tree
+시간을 설정하여 1분 간 마스코트를 가장 많이 클릭한 사용자를 선출하는 프로그램
+
+## 주요 기능
+
+- 회원 가입, 로그인, 랭킹 집계를 위한 HTTP 서버
+- 프로그램 구동을 위한 TCP 서버
+
+## 폴더 구조
 
 <details>
 <summary>폴더 구조</summary>
@@ -40,3 +47,19 @@
 ```
 
 </details>
+
+## 실행
+
+1. 요구사항
+
+```
+Node.js 20+
+SQLite 활성화 : --experimental-sqlite
+```
+
+2. 테스트 방법
+
+```
+set NODE_ENV=test
+node --experimental-sqlite --test src/tests/unit/integration.test.js
+```
